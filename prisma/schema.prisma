@@ -103,3 +103,12 @@ model RecentlyViewed {
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 }
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String
+  details   String
+  imageUrl  String
+  author    String
+  createdAt DateTime @default(now())
+}

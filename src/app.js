@@ -8,6 +8,7 @@ import { categoryRoutes } from "./routes/categoryRoutes.js";
 import { shopRoutes } from "./routes/shopRoutes.js";
 import { userFeaturesRoutes } from "./routes/userFeaturesRoutes.js";
 import { paymentRoutes } from "./routes/paymentRoutes.js";
+import { blogRoutes } from "./routes/blogRoutes.js";
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/shop", shopRoutes);
 app.use("/api", userFeaturesRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/blog", blogRoutes);
 
 export default app;
