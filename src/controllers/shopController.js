@@ -2,6 +2,22 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Get all shops
+export const getAllShops = async (req, res) => {
+  try {
+    const shops = await prisma.shop.findMany();
+
+    if (!shops.length) {
+      return res.status(404).json({ error: "No shops found." });
+    }
+
+    res.status(200).json(shops); // Return all shops
+  } catch (error) {
+    console.error("Error fetching all shops:", error);
+    res.status(500).json({ error: "Failed to fetch shops." });
+  }
+};
+
 // Get the current shop(s) for the vendor
 export const getShop = async (req, res) => {
   const { userId } = req.query; // Read from query params
