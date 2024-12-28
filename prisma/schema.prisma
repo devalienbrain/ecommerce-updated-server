@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password       String
+  role           String           @default("user") // "admin", "vendor", "user"
+  createdAt      DateTime         @default(now())
+  products       Product[] // A user can create multiple products
+  shops          Shop[] // A user (vendor) can own multiple shops
+  orders         Order[] // A user can have multiple orders
+  cart           Cart[] // A user can have multiple cart items
+  reviews        Review[] // A user can write multiple reviews
+  recentlyViewed RecentlyViewed[] // A user can view multiple products
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[] // A category can have multiple products
+}
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Float
+  inventory  Int
+  image      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  Int
+  categoryId Int
+
+  User           User             @relation(fields: [createdBy], references: [id]) // Product created by a user
+  Category       Category         @relation(fields: [categoryId], references: [id]) // Product belongs to a category
+  orders         Order[]          @relation("OrderProducts") // A product can be part of multiple orders
+  cart           Cart[]           // A product can be part of multiple carts
+  reviews        Review[]         // A product can have multiple reviews
+  recentlyViewed RecentlyViewed[] // A product can be viewed multiple times
+}
+
+model Order {
+  id         String   @id @default(cuid()) // Change to String and use cuid() or UUID
+  userId     Int
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  status     String   @default("pending")
+
+  user    User        @relation(fields: [userId], references: [id])
+  products Product[]   @relation("OrderProducts")
+}
+
+
+
+model Shop {
+  id          Int     @id @default(autoincrement())
+  name        String
+  logo        String?
+  description String
+  vendorId    Int
+
+  vendor User @relation(fields: [vendorId], references: [id]) // Shop belongs to a vendor
+}
+
+
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int      @default(0) // Between 1 and 5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model RecentlyViewed {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  viewedAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
